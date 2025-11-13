@@ -326,7 +326,6 @@
       setWeatherBackground(cur);
       startWeatherEffect(cur.weather[0].id);
       
-      // ✅ Centrer la carte sur la ville
       initMap();
       if (map) {
         map.setView([cur.coord.lat, cur.coord.lon], 10);
@@ -439,7 +438,6 @@
 
     function toggleUnit() {
       currentUnit = currentUnit === 'metric' ? 'imperial' : 'metric';
-      // ✅ Affiche l'unité CIBLE
       els.unit.textContent = currentUnit === 'metric' ? '°F' : '°C';
       updateTemperatures();
     }
@@ -473,8 +471,23 @@
     setInitialBackground();
     setTextColorForTheme();
     displayRecentSearches();
-    // ✅ Bouton affiche "°F" au démarrage
     els.unit.textContent = '°F';
+
+    // ✅ Chargement fiable de Londres au premier affichage
+    window.addEventListener('load', () => {
+      try {
+        const recent = JSON.parse(localStorage.getItem('weatherRecentSearches') || '[]');
+        if (recent.length === 0) {
+          console.log("→ Chargement par défaut : Londres");
+          setTimeout(() => {
+            fetchWeather(51.5074, -0.1278, "Londres", "GB")
+              .catch(err => console.error("Erreur chargement Londres :", err));
+          }, 800);
+        }
+      } catch (e) {
+        console.error("Erreur init chargement par défaut :", e);
+      }
+    });
   </script>
 </body>
 </html>
