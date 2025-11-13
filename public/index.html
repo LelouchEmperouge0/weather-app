@@ -163,7 +163,10 @@
         </div>
       </div>
     </div>
-    <footer><div id="status">Prêt. Entrez une ville.</div></footer>
+    <footer>
+      <div id="status">Prêt. Entrez une ville.</div>
+      <div id="debug" style="font-size:11px; color:#999; margin-top:6px; line-height:1.4;"></div>
+    </footer>
   </div>
   <div id="weather-effects"></div>
 
@@ -310,6 +313,7 @@
         setStatus("Données mises à jour !");
       } catch (e) {
         setStatus("Erreur de récupération des données.", true);
+        document.getElementById('debug').textContent += ` ✘ Erreur API : ${e.message}`;
       }
     }
 
@@ -459,33 +463,34 @@
       setTextColorForTheme();
     }
 
-    // === ÉVÉNEMENTS ===
     els.search.onclick = searchCity;
     els.loc.onclick = locateMe;
     els.unit.onclick = toggleUnit;
     els.mode.onclick = toggleMode;
     els.input.addEventListener("keypress", e => { if (e.key === "Enter") searchCity(); });
 
-    // === INITIALISATION ===
     document.documentElement.classList.add("light");
     setInitialBackground();
     setTextColorForTheme();
     displayRecentSearches();
     els.unit.textContent = '°F';
 
-    // ✅ Chargement fiable de Londres au premier affichage
+    // ✅ CHARGEMENT DE LONDRES AU PREMIER AFFICHAGE
     window.addEventListener('load', () => {
+      const debugEl = document.getElementById('debug');
+      debugEl.textContent = "→ Vérification historique...";
       try {
         const recent = JSON.parse(localStorage.getItem('weatherRecentSearches') || '[]');
         if (recent.length === 0) {
-          console.log("→ Chargement par défaut : Londres");
+          debugEl.textContent += " Aucun historique → chargement de Londres...";
           setTimeout(() => {
-            fetchWeather(51.5074, -0.1278, "Londres", "GB")
-              .catch(err => console.error("Erreur chargement Londres :", err));
-          }, 800);
+            fetchWeather(51.5074, -0.1278, "Londres", "GB");
+          }, 1000);
+        } else {
+          debugEl.textContent += " Historique trouvé.";
         }
       } catch (e) {
-        console.error("Erreur init chargement par défaut :", e);
+        debugEl.textContent = "→ Erreur : " + e.message;
       }
     });
   </script>
